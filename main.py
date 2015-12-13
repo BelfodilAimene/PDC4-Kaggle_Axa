@@ -1,4 +1,5 @@
 import time
+
 from source.controller.AllDriverTrajectoriesScorer import AllDriverTrajectoriesScorer
 
 def main(sourcePath="Drivers2",outputPath="axa_Submission.csv") :
