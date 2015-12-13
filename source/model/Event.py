@@ -1,3 +1,5 @@
+import math
+
 class Event :
     def __init__(self,t,x,y) :
         self.t=t
@@ -11,7 +13,12 @@ class Event :
         return ((self.x-other.x)**p+(self.y-other.y)**p)**(1./p)
 
     def delai(self,other) :
-        return abs(self.t-other.t) 
+        return abs(self.t-other.t)
+
+    def bearing(self,other) :
+        dx=other.x-self.x
+        dy=other.y-self.y
+        return math.atan2(dy, dx)
     
     def __str__(self) :
         return "({0} : {1},{2})".format(self.t,self.x,self.y)

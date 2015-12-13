@@ -5,8 +5,7 @@ from source.controller.AllDriverTrajectoriesScorer import AllDriverTrajectoriesS
 def main(sourcePath="Drivers2",outputPath="axa_Submission.csv") :
 
     staringTime=time.time()
-    print "-"*40
-    print "Execution ..."
+
     allDriverTrajectoriesScorer=AllDriverTrajectoriesScorer(sourcePath,outputPath)
     allDriverTrajectoriesScorer.ouptutAllScores()
         

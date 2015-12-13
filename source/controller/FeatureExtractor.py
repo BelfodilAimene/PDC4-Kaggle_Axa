@@ -1,41 +1,50 @@
 import numpy as np
 import math
 
-TIME=0
+FEATURE_NUMBER=9
 
+TIME=0
 DISTANCE=1
 SPEED=2
 ACCELERATION=3
 DECELERATION=4
+BEARING=5 #in radian
+ABSOLUTE_ANGULAR_VELOCITY=6
+ANGULAR_ACCELERATION=7
+ANGULAR_DECELERATION=8
 
-ANGLE=4 #in radian
-ANGULAR_VELOCITY=5
-ANGULAR_ACCELERATION=6
-ANGULAR_DECELERATION=7
 
 class FeatureExtractor :
     def getFeatureMap(self,trace) :
-        if (not trace) : return []
+        if (len(trace)<3) : return []
 
         result=[]
-        lastLine=[0,0,0,0,0,0]
+        lastLine=[0]*FEATURE_NUMBER
         lastEvent=trace[0]
 
         for e in trace :
+            newLine=[0]*FEATURE_NUMBER
+
             timeDifference=e.delai(lastEvent)
             
-            time_feature=e.t
-            distance_feature=e.distance(lastEvent)
-            speed_feature=distance_feature/timeDifference if (timeDifference>0) else 0
-            acceleration_feature=max(speed_feature-lastLine[SPEED],0)/timeDifference if (timeDifference>0) else 0
-            deceleration_feature=min(speed_feature-lastLine[SPEED],0)/timeDifference if (timeDifference>0) else 0
-            angle_feature=math.atan2(e.y, e.x)
-            
-            lastLine=[time_feature,distance_feature,speed_feature,acceleration_feature,deceleration_feature,angle_feature]
-            lastEvent=e
-            
-            result.append(lastLine)
+            newLine[TIME]=e.t
+            newLine[DISTANCE]=e.distance(lastEvent)
+            newLine[BEARING]=e.bearing(lastEvent)
 
-        result=np.matrix(result)
-        print result
+            if (timeDifference>0) :
+                newLine[SPEED]=newLine[DISTANCE]/timeDifference
+                newLine[ACCELERATION]=max(newLine[SPEED]-lastLine[SPEED],0)/timeDifference
+                newLine[DECELERATION]=max(lastLine[SPEED]-newLine[SPEED],0)/timeDifference
+
+                newLine[ABSOLUTE_ANGULAR_VELOCITY]=(abs(newLine[BEARING]))/timeDifference
+                newLine[ANGULAR_ACCELERATION]=max(newLine[ABSOLUTE_ANGULAR_VELOCITY]-lastLine[ABSOLUTE_ANGULAR_VELOCITY],0)/timeDifference
+                newLine[ANGULAR_DECELERATION]=max(lastLine[ABSOLUTE_ANGULAR_VELOCITY]-newLine[ABSOLUTE_ANGULAR_VELOCITY],0)/timeDifference
+            
+            result.append(newLine)
+
+            lastEvent=e
+            lastLine=newLine
+
+        #Eliminate element 0 and 1 (false acceleration , ...)
+        result=np.matrix(result[2:])
         return result
