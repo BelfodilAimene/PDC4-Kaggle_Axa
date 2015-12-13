@@ -1,7 +1,7 @@
 import time
 from source.controller.AllDriverTrajectoriesScorer import AllDriverTrajectoriesScorer
 
-def main(sourcePath="Drivers",outputPath="axa_Submission.csv") :
+def main(sourcePath="Drivers2",outputPath="axa_Submission.csv") :
 
     staringTime=time.time()
     print "-"*40

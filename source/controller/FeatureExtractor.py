@@ -14,19 +14,26 @@ ANGULAR_DECELERATION=7
 
 class FeatureExtractor :
     def getFeatureMap(self,trace) :
-        timeList=[event.t for event in trace]
-        distanceList=self.getDistanceList(trace)
+        if (not trace) : return []
 
-        return np.matrix(zip(timeList,distanceList)) 
+        result=[]
+        lastLine=[0,0,0,0,0]
+        lastEvent=trace[0]
 
-    #-----------------------------------------------------------
-    def getDistanceList(self,trace) :
-        distanceList=[]
-        if (trace) :
-            d=0
-            lastEvent=trace[0]
-            for e in trace :
-                distanceList.append(d)
-                d+=lastEvent.distance(e)
-        return distanceList
+        for e in trace :
+            timeDifference=e.delai(lastEvent)
             
+            time_feature=e.t
+            distance_feature=e.distance(lastEvent)
+            speed_feature=distance_feature/timeDifference if (timeDifference>0) else 0
+            acceleration_feature=max(speed_feature-lastLine[SPEED],0)/timeDifference if (timeDifference>0) else 0
+            deceleration_feature=min(speed_feature-lastLine[SPEED],0)/timeDifference if (timeDifference>0) else 0
+
+            lastLine=[time_feature,distance_feature,speed_feature,acceleration_feature,deceleration_feature]
+            lastEvent=e
+            
+            result.append(lastLine)
+
+        result=np.matrix(result)
+        print result
+        return result
