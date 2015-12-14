@@ -1,27 +1,24 @@
 from ..model.Driver import Driver
-from Cleaner import Cleaner
-from FeatureExtractor import FeatureExtractor
-from Normalizer import Normalizer
-from Scorer import Scorer
 
 class DriverTrajectoriesScorer :
+    def __init__(self,cleaner,featureExtractor,normalizer,scorer) :
+        self.cleaner=cleaner
+        self.featureExtractor=featureExtractor
+        self.normalizer=normalizer
+        self.scorer=scorer
+        
     def scoreDriverTrajectories(self,directoryPath) :
         driver=Driver(directoryPath)
         driver.loadTraces()
 
-        cleaner=Cleaner()
-        featureExtractor=FeatureExtractor()
-        normalizer=Normalizer()
-        scorer=Scorer()
-
         featureMaps=[]
         for trace in driver :
-            trace=cleaner.clean(trace)
-            featureMap=featureExtractor.getFeatureMap(trace)
-            featureMap=normalizer.normalize(featureMap)
+            trace=self.cleaner.clean(trace)
+            featureMap=self.featureExtractor.getFeatureMap(trace)
+            featureMap=self.normalizer.normalize(featureMap)
             featureMaps.append((trace.traceName,featureMap))
 
-        scores=scorer.getScores(featureMaps)
+        scores=self.scorer.getScores(featureMaps)
 
         sortedScores=sorted(scores,key=lambda element : int(element[0]))
         sortedScores=map(lambda element : (driver.driverName+"_"+element[0],element[1]),sortedScores)

@@ -1,3 +1,4 @@
+from ...abstractController.FeatureExtractor import FeatureExtractor
 import numpy as np
 import math
 
@@ -14,7 +15,7 @@ ANGULAR_ACCELERATION=7
 ANGULAR_DECELERATION=8
 
 
-class FeatureExtractor :
+class SimpleFeatureExtractor(FeatureExtractor) :
     def getFeatureMap(self,trace) :
         if (len(trace)<3) : return []
 
