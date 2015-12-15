@@ -4,8 +4,8 @@ from source.controller.AllDriverTrajectoriesScorer import AllDriverTrajectoriesS
 
 from source.controller.cleaners.NoCleaner import NoCleaner
 from source.controller.featureExtractors.SimpleFeatureExtractor import SimpleFeatureExtractor
-from source.controller.normalizers.NoNormalizer import NoNormalizer
-from source.controller.scorers.NoScorer import NoScorer
+from source.controller.normalizers.MinMaxNormalizer import MinMaxNormalizer
+from source.controller.scorers.clusterScorer.ClusterScorer import ClusterScorer
 
 def main(sourcePath="Drivers2",outputPath="axa_Submission.csv") :
 
@@ -13,11 +13,11 @@ def main(sourcePath="Drivers2",outputPath="axa_Submission.csv") :
 
     noCleaner=NoCleaner()
     simpleFeatureExtractor=SimpleFeatureExtractor()
-    noNormalizer=NoNormalizer()
-    noScorer=NoScorer()
+    minMaxNormalizer=MinMaxNormalizer()
+    myScorer=ClusterScorer()
 
     allDriverTrajectoriesScorer=AllDriverTrajectoriesScorer(sourcePath,outputPath)
-    allDriverTrajectoriesScorer.setCleaner(noCleaner).setFeatureExtractor(simpleFeatureExtractor).setNormalizer(noNormalizer).setScorer(noScorer)
+    allDriverTrajectoriesScorer.setCleaner(noCleaner).setFeatureExtractor(simpleFeatureExtractor).setNormalizer(minMaxNormalizer).setScorer(myScorer)
     allDriverTrajectoriesScorer.ouptutAllScores()
         
     elapsed_time=(time.time()-staringTime)
@@ -28,3 +28,18 @@ def main(sourcePath="Drivers2",outputPath="axa_Submission.csv") :
     print "-"*40
     
 main()
+
+"""
+from numpy.fft import rfftfreq,rfft
+def tryFFt(signal=[1,-1]) :
+    print signal
+    r=rfft(signal)
+    f=rfftfreq(len(signal),d=1./len(signal))
+    l=sorted(zip(r,f),key=lambda e : -abs(e[0]))
+    
+    print r
+    print f
+    print l
+
+tryFFt()
+"""

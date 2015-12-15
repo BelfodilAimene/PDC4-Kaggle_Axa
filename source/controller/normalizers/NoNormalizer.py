@@ -1,5 +1,5 @@
 from ...abstractController.Normalizer import Normalizer
 
 class NoNormalizer(Normalizer) :
-    def normalize(self,featureMap) :
-        return featureMap
+    def normalize(self,featureMapsList) :
+        return featureMapsList

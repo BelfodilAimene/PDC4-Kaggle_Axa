@@ -15,9 +15,9 @@ class DriverTrajectoriesScorer :
         for trace in driver :
             trace=self.cleaner.clean(trace)
             featureMap=self.featureExtractor.getFeatureMap(trace)
-            featureMap=self.normalizer.normalize(featureMap)
             featureMaps.append((trace.traceName,featureMap))
 
+        featureMaps=self.normalizer.normalize(featureMaps)
         scores=self.scorer.getScores(featureMaps)
 
         sortedScores=sorted(scores,key=lambda element : int(element[0]))

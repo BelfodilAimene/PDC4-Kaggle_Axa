@@ -4,11 +4,11 @@ class Normalizer :
     __metaclass__ = ABCMeta
     
     @abstractmethod
-    def normalize(self,featureMap) :
+    def normalize(self,featureMapsList) :
         """
         input :
-           featureMap : featureMap (feature matrix)
+           featureMapsList : list of pair (traceName, featureMap)
         output :
-           featureMap : normalized feature map 
+           featureMapsList : normalized feature Maps List 
         """
         pass
