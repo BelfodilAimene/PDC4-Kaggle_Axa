@@ -18,7 +18,8 @@ class MinMaxNormalizer(Normalizer) :
 
         for traceName,featureMap in featureMapsList :
             for j in range(featureNumber) :
-                featureMap[:,j+1]=(featureMap[:,j+1]-minPerFeature[j])/(maxPerFeature[j]-minPerFeature[j])
+                quotient=maxPerFeature[j]-minPerFeature[j]
+                featureMap[:,j+1]=(featureMap[:,j+1]-minPerFeature[j])/quotient if quotient>0 else 0
                 
         print "-"*40
             
