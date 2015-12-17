@@ -1,6 +1,6 @@
 import time
 from source.model.Trace import Trace
-from source.exploratory.Exploration import plotEvents,plotFeatures
+from source.exploratory.Exploration import plotEvents,plotFeature
 from source.controller.featureExtractors.SimpleFeatureExtractor import *
 from source.controller.scorers.clusterScorer.Utils import getSpectrum,showSpectrum
 def main(sourcePath="Drivers/16/103.csv") :

@@ -13,7 +13,7 @@ def plotEvents(trace) :
     plt.title('Taille de la trace : {0}s'.format(len(trace)))
     plt.show()
 
-def plotFeatures(featureMap,n) :
+def plotFeature(featureMap,n) :
     xList=[e.item((0,0)) for e in featureMap[:,0]]
     yList=[e.item((0,0)) for e in featureMap[:,n]]
     plt.figure(1)
