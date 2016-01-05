@@ -17,11 +17,13 @@ class Event :
 
     def bearing(self,other) :
         """
-        return absolute angle between the two position (between 0 and pi)
+        return absolute angle between the two position (between 0 and 2 pi)
         """
         dx=other.x-self.x
         dy=other.y-self.y
-        return abs(math.atan2(dy, dx))
+        angle=math.atan2(dy, dx)
+        if (angle>=0) : return angle
+        else : return 2*math.pi+angle
     
     def __str__(self) :
         return "({0} : {1},{2})".format(self.t,self.x,self.y)

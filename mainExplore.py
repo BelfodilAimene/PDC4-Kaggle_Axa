@@ -7,12 +7,14 @@ def main(sourcePath="Drivers/16/103.csv") :
     featureExtractor=SimpleFeatureExtractor()
     trace=Trace(sourcePath)
     trace.loadTrace()
+    #plotEvents(trace)
     featureMap=featureExtractor.getFeatureMap(trace)
+    feature=BEARING
+    plotFeature(featureMap,feature)
+    
 
-    feature=SPEED
+    #times,signal=zip(*[(e.item((0,0)),e.item((0,feature))) for e in featureMap])
 
-    times,signal=zip(*[(e.item((0,0)),e.item((0,feature))) for e in featureMap])
-
-    showSpectrum(times,signal)
+    #showSpectrum(times,signal)
     
 main()

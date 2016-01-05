@@ -37,7 +37,9 @@ class SimpleFeatureExtractor(FeatureExtractor) :
                 newLine[ACCELERATION]=max(newLine[SPEED]-lastLine[SPEED],0)/timeDifference
                 newLine[DECELERATION]=max(lastLine[SPEED]-newLine[SPEED],0)/timeDifference
 
-                newLine[ABSOLUTE_ANGULAR_VELOCITY]=(abs(newLine[BEARING]))/timeDifference
+                absoluteAngleDifference=abs(newLine[BEARING]-lastLine[BEARING])
+                if (absoluteAngleDifference>math.pi) : absoluteAngleDifference=2*math.pi-absoluteAngleDifference 
+                newLine[ABSOLUTE_ANGULAR_VELOCITY]=absoluteAngleDifference/timeDifference
                 newLine[ANGULAR_ACCELERATION]=max(newLine[ABSOLUTE_ANGULAR_VELOCITY]-lastLine[ABSOLUTE_ANGULAR_VELOCITY],0)/timeDifference
                 newLine[ANGULAR_DECELERATION]=max(lastLine[ABSOLUTE_ANGULAR_VELOCITY]-newLine[ABSOLUTE_ANGULAR_VELOCITY],0)/timeDifference
             
