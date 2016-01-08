@@ -4,6 +4,8 @@ from numpy.fft import rfftfreq,rfft
 import matplotlib.pyplot as plt
 
 #----------------------------------------------------------------------
+#         FFT and STFT
+#----------------------------------------------------------------------
 
 def getFFT(signal, sample_spacing=1) :
     """
@@ -11,12 +13,53 @@ def getFFT(signal, sample_spacing=1) :
     """
     return zip(rfftfreq(len(signal),d=sample_spacing),rfft(signal))
 
-def getSTFT(signal, sample_spacing=1, slidingWindowSize=20, stepSize=10) :
+def segmentSignal(signal, slidingWindowSize=20, stepSize=10) :
+    """
+    segment signal with slidingWindowSize=20 (number of sample in window) and stepSize=10 (number of samle to sample from window to another)
+    """
+    if (not signal) : return []
     
-    return zip(rfftfreq(len(signal),d=sample_spacing),rfft(signal))
+    numberOfSemgent=len(signal)/stepSize
+    if (len(signal)%stepSize) : numberOfSemgent+=1
+    segmented=[list() for _ in xrange(numberOfSemgent)]
+
+    k=0
+    lesserSegment=0
+    upperSegment=-1
+    
+    for v in signal :
+        if (k%stepSize==0) : upperSegment+=1  
+        for i in xrange(lesserSegment,upperSegment+1) : segmented[i].append(v)
+        if (len(segmented[lesserSegment])==slidingWindowSize) : lesserSegment+=1 
+        k+=1
+    last=numberOfSemgent-1
+    while (len(segmented[last])<slidingWindowSize) :
+        segmented[last]+=[0]*(slidingWindowSize-len(segmented[last]))
+        last-=1
+    return segmented
+    
+
+def getSTFT(signal, sample_spacing=1, slidingWindowSize=20, stepSize=10) :
+    """
+    Get short-time fourier transform with slidingWindowSize=20 (number of sample in window) and stepSize=10 (number of samle to sample from window to another)
+    """
+    segmentedSignal=segmentSignal(signal,slidingWindowSize,stepSize)
+    segmentedSignalSTFT=[]
+    for segment in segmentedSignal : segmentedSignalSTFT.append(rfft(segment))
+    spectrogram=np.array(segmentedSignalSTFT)
+    t=np.array([stepSize*i for i in xrange(len(segmentedSignal))])
+    f=np.array(rfftfreq(slidingWindowSize,d=sample_spacing))
+    return t,f,spectrogram
+
+"""
+from scipy import signal as scipySignalProcessing
+def getSTFTWithScipy(signal,sample_spacing=1, slidingWindowSize=20, stepSize=10) :
+    return scipySignalProcessing.spectrogram(signal,fs=1.0/sample_spacing,window=('boxcar', slidingWindowSize),nperseg=slidingWindowSize,noverlap=slidingWindowSize-stepSize,mode="psd")
+"""    
 
 #----------------------------------------------------------------------
-
+#     plot signal and spectrum
+#----------------------------------------------------------------------
 def showFFT(signal,sample_spacing=1) :
     """
     the signal is list of values sampeled with the sampling_rate (ex : 1s)
@@ -52,5 +95,13 @@ def showFFT(signal,sample_spacing=1) :
     plt.ylabel("Phase")
 
     plt.show()
-    
+
+def showSpectrogramAmp(signal, sample_spacing=1, slidingWindowSize=20, stepSize=10) :
+    t,f,spectrogram=getSTFT(signal, sample_spacing=sample_spacing, slidingWindowSize=slidingWindowSize, stepSize=stepSize)
+    spectrogram=zip(*spectrogram)
+    amp=np.array([[abs(z) for z in l] for l in spectrogram])
+    plt.pcolormesh(t, f, amp)
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.show()
 #----------------------------------------------------------------------
