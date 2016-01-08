@@ -51,6 +51,16 @@ def getSTFT(signal, sample_spacing=1, slidingWindowSize=20, stepSize=10) :
     f=np.array(rfftfreq(slidingWindowSize,d=sample_spacing))
     return t,f,spectrogram
 
+def getMaximalFrequencies(signal,sample_spacing=1, slidingWindowSize=20, stepSize=10,numberOfFrequency=1) :
+    t,f,spectrogram=getSTFT(signal, sample_spacing=sample_spacing, slidingWindowSize=slidingWindowSize, stepSize=stepSize)
+    f=[float(int(1000*freq))/1000 for freq in f]
+    numberOfFrequency=min(numberOfFrequency,len(f))
+    maximalFrequencies=[]
+    for shortFFT in spectrogram :
+        sortedFrequencies=zip(*sorted(zip(f,shortFFT),key = lambda element : abs(element[1]), reverse=True))[0]
+        maximalFrequencies.append(list(sortedFrequencies[0:numberOfFrequency]))
+    return maximalFrequencies
+
 """
 from scipy import signal as scipySignalProcessing
 def getSTFTWithScipy(signal,sample_spacing=1, slidingWindowSize=20, stepSize=10) :
