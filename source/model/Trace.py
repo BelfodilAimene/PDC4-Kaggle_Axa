@@ -22,6 +22,19 @@ class Trace :
             self.loadTrace()
         return self.trace
 
+    def getPathDistance(self) :
+        d=0
+        lastEvent=None
+        for event in self.trace :
+            if lastEvent : d+=event.distance(lastEvent)
+            lastEvent=event
+        return d
+
+    def getPathTime(self) :
+        if (not self.trace) : return 0
+        else : return self.trace[-1].t
+            
+            
     #----------------------------------------------------------
     #   Trace is seen as list of events
     #----------------------------------------------------------

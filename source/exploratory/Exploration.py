@@ -23,3 +23,25 @@ def plotFeature(featureMap,n) :
     plt.ylabel("feature")
     plt.title('Taille de la trace : {0}s'.format(xList[-1]))
     plt.show()
+
+def plotBoxPlotTracesDistance(driver) :
+    plt.boxplot([trace.getPathDistance() for trace in driver])
+    plt.show()
+
+def plotBoxPlotTracesTime(driver) :
+    plt.boxplot([trace.getPathTime() for trace in driver])
+    plt.show()
+
+def plotBoxPlotTracesSpeeds(driver) :
+    speeds=[]
+    labels=[]
+    for trace in driver :
+        traceSpeed=[]
+        lastEvent=None
+        for event in trace :
+            if (lastEvent) : traceSpeed.append(event.distance(lastEvent)/event.delai(lastEvent))
+            lastEvent=event
+        labels.append(trace.traceName)
+        speeds.append(traceSpeed)
+    plt.boxplot(speeds,labels=labels)
+    plt.show()
