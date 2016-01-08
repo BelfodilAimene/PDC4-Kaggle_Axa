@@ -5,8 +5,8 @@ class ModelGenerator :
     def __init__(self,statesNumber=6) :
         self.statesNumber=statesNumber
         random.seed(0)
-        self.distribution = UniformDistribution(0.0, 1.0)
     def generateModel(self,modelName) :
+        self.distribution = UniformDistribution(0.0, 1.0)
         model= Model(name=modelName)
         states=[]
         for i in range(self.statesNumber) :
