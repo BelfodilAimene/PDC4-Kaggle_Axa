@@ -5,24 +5,26 @@ import matplotlib.pyplot as plt
 
 #----------------------------------------------------------------------
 
-def getFFT(signal) :
+def getFFT(signal, sampling_rate=1) :
     """
-    get (frequency, complex coefficient) list representing the spectrum of the signal 
+    get (frequency, complex coefficient) list representing the spectrum of the signal (list of value sampled with the sampling_rate (every 1s))
     """
-    return zip(rfftfreq(len(signal),d=1),rfft(signal))
+    return zip(rfftfreq(len(signal),d=sampling_rate),rfft(signal))
 
-def getSTFT(signal, slidingWindowSize=20, stepSize=10) :
-    return zip(rfftfreq(len(signal),d=1),rfft(signal))
+def getSTFT(signal, sampling_rate=1, slidingWindowSize=20, stepSize=10) :
+    
+    return zip(rfftfreq(len(signal),d=sampling_rate),rfft(signal))
 
 #----------------------------------------------------------------------
 
-def showFFT(times,signal) :
+def showFFT(signal,sampling_rate=1) :
     """
-    times and signal are parallet vector, for each instant in <times> vector, <signal> give the amplitude of the signal
+    the signal is list of values sampeled with the sampling_rate (ex : 1s)
+    show the signal, amplitude spectrum, phase spectrum
     """
     plt.figure(1)
     plt.clf()
-    xList,yList=zip(*getFFT(signal))
+    xList,yList=zip(*getFFT(signal,sampling_rate=sampling_rate))
     histoWidth=float("inf")
     for i in range(len(xList)-1) : histoWidth=min(histoWidth,xList[i+1]-xList[i])
     histoWidth*=0.3
@@ -30,6 +32,7 @@ def showFFT(times,signal) :
     #Time serie
     ax=plt.subplot(311)
     amp=[abs(c) for c in yList]
+    times=[sampling_rate*i for i in range(len(signal))]
     plt.plot(times,signal, '-',color="blue")
     plt.xlabel("time")
     plt.ylabel("Time serie")

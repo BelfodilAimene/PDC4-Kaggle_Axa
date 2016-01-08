@@ -20,9 +20,9 @@ def exploreOne(sourcePath="Drivers/16/160.csv") :
     
     #plotFeature(featureMap,feature)
     
-    times,signal=zip(*[(e.item((0,0)),e.item((0,feature))) for e in featureMap])
-
-    showFFT(times,signal)
+    signal=[e.item((0,feature)) for e in featureMap]
+    sampling_rate=1
+    showFFT(signal,sampling_rate=sampling_rate)
 
 def exploreDriver(sourcePath="Drivers/16") :
     driver=Driver(sourcePath)
