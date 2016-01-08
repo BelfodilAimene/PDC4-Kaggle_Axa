@@ -5,26 +5,26 @@ import matplotlib.pyplot as plt
 
 #----------------------------------------------------------------------
 
-def getFFT(signal, sampling_rate=1) :
+def getFFT(signal, sample_spacing=1) :
     """
-    get (frequency, complex coefficient) list representing the spectrum of the signal (list of value sampled with the sampling_rate (every 1s))
+    get (frequency, complex coefficient) list representing the spectrum of the signal (list of value sampled with the sample_spacing (1/sample_rate) (every 1s))
     """
-    return zip(rfftfreq(len(signal),d=sampling_rate),rfft(signal))
+    return zip(rfftfreq(len(signal),d=sample_spacing),rfft(signal))
 
-def getSTFT(signal, sampling_rate=1, slidingWindowSize=20, stepSize=10) :
+def getSTFT(signal, sample_spacing=1, slidingWindowSize=20, stepSize=10) :
     
-    return zip(rfftfreq(len(signal),d=sampling_rate),rfft(signal))
+    return zip(rfftfreq(len(signal),d=sample_spacing),rfft(signal))
 
 #----------------------------------------------------------------------
 
-def showFFT(signal,sampling_rate=1) :
+def showFFT(signal,sample_spacing=1) :
     """
     the signal is list of values sampeled with the sampling_rate (ex : 1s)
     show the signal, amplitude spectrum, phase spectrum
     """
     plt.figure(1)
     plt.clf()
-    xList,yList=zip(*getFFT(signal,sampling_rate=sampling_rate))
+    xList,yList=zip(*getFFT(signal,sample_spacing=sample_spacing))
     histoWidth=float("inf")
     for i in range(len(xList)-1) : histoWidth=min(histoWidth,xList[i+1]-xList[i])
     histoWidth*=0.3
@@ -32,7 +32,7 @@ def showFFT(signal,sampling_rate=1) :
     #Time serie
     ax=plt.subplot(311)
     amp=[abs(c) for c in yList]
-    times=[sampling_rate*i for i in range(len(signal))]
+    times=[sample_spacing*i for i in range(len(signal))]
     plt.plot(times,signal, '-',color="blue")
     plt.xlabel("time")
     plt.ylabel("Time serie")
