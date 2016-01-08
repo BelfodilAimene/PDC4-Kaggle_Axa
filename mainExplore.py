@@ -25,7 +25,7 @@ def exploreOne(sourcePath="Drivers/16/13.csv") :
 
     #getSTFT(signal,sample_spacing=sample_spacing)
     #showFFT(signal,sample_spacing=sample_spacing)
-    #showSpectrogramAmp(signal,sample_spacing=sample_spacing)
+    showSpectrogramAmp(signal,sample_spacing=sample_spacing,slidingWindowSize=20, stepSize=10)
     
     print getMaximalFrequencies(signal,sample_spacing=sample_spacing,slidingWindowSize=20, stepSize=10,numberOfFrequency=3)
     
