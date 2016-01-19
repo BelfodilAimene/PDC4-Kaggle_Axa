@@ -1,7 +1,8 @@
-import math
-import numpy as np
-import matplotlib.pyplot as plt
+import math,numpy as np,matplotlib.pyplot as plt
 
+#-----------------------------------------------------------
+#      Plot Events and Feature
+#-----------------------------------------------------------
 def plotEvents(trace) :
     xList=np.array([event.x for event in trace])
     yList=np.array([event.y for event in trace])
@@ -13,16 +14,22 @@ def plotEvents(trace) :
     plt.title('Taille de la trace : {0}s'.format(len(trace)))
     plt.show()
 
-def plotFeature(featureMap,n) :
-    xList=[e.item((0,0)) for e in featureMap[:,0]]
-    yList=[e.item((0,0)) for e in featureMap[:,n]]
+def plotSignal(signal) :
     plt.figure(1)
     plt.clf()
-    plt.plot(xList,yList, '-', markerfacecolor='r',markeredgecolor='r', markersize=1)
+    plt.plot(range(len(signal)),signal, '-', markerfacecolor='r',markeredgecolor='r', markersize=1)
     plt.xlabel("t (s)")
     plt.ylabel("feature")
-    plt.title('Taille de la trace : {0}s'.format(xList[-1]))
+    plt.title('Taille de la trace : {0}s'.format(len(signal)))
     plt.show()
+
+def plotFeature(featureMap,n) :
+    plotSignal([e.item((0,0)) for e in featureMap[:,n]])
+    
+
+#-----------------------------------------------------------
+#      Plot Distributions as Box Plot
+#-----------------------------------------------------------
 
 def plotBoxPlotTracesDistance(driver) :
     plt.boxplot([trace.getPathDistance() for trace in driver])
@@ -45,3 +52,6 @@ def plotBoxPlotTracesSpeeds(driver) :
         speeds.append(traceSpeed)
     plt.boxplot(speeds,labels=labels)
     plt.show()
+
+#-----------------------------------------------------------
+

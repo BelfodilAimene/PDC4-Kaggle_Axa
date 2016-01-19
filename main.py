@@ -6,8 +6,9 @@ from source.controller.cleaners.NoCleaner import NoCleaner
 from source.controller.featureExtractors.SimpleFeatureExtractor import SimpleFeatureExtractor
 from source.controller.normalizers.MinMaxNormalizer import MinMaxNormalizer
 from source.controller.scorers.clusterScorer.ClusterScorer import ClusterScorer
-from source.controller.scorers.HMM.HMMBasedScorer import HMMBasedScorer
-def main(sourcePath="Drivers3",outputPath="axa_Submission.csv") :
+#from source.controller.scorers.HMM.HMMBasedScorer import HMMBasedScorer
+
+def main(sourcePath="Data/Drivers2",outputPath="axa_Submission.csv") :
 
     staringTime=time.time()
 

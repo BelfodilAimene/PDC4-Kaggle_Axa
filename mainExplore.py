@@ -1,49 +1,36 @@
 import time
+import matplotlib.pyplot as plt
+
 from source.model.Trace import Trace
 from source.model.Driver import Driver
-from source.exploratory.Exploration import *
+
 from source.controller.featureExtractors.SimpleFeatureExtractor import *
-from source.utils.Utils import *
-def exploreOne(sourcePath="Drivers/16/13.csv") :
+from source.controller.scorers.utils.Utils import *
+from source.controller.cleaners.utils.Utils import *
+
+from source.exploratory.Exploration import *
+
+def exploreOne(sourcePath="Data/Drivers/16/122.csv") :
 
     trace=Trace(sourcePath)
     trace.loadTrace()
+    print "Distance :",trace.getPathDistance(),"m"
+    print "Time :",trace.getPathTime(),"s"
 
-    print trace.getPathDistance(),"m"
-    print trace.getPathTime(),"s"
-
-    #plotEvents(trace)
+    plotEvents(trace)
 
     featureExtractor=SimpleFeatureExtractor()
     featureMap=featureExtractor.getFeatureMap(trace)
     feature=SPEED
-    
-    #plotFeature(featureMap,feature)
-    
+    windowSize=60
     signal=[e.item((0,feature)) for e in featureMap]
-    sample_spacing=1
-
-    #getSTFT(signal,sample_spacing=sample_spacing)
-    #showFFT(signal,sample_spacing=sample_spacing)
-    showSpectrogramAmp(signal,sample_spacing=sample_spacing,slidingWindowSize=20, stepSize=10)
-    
-    print getMaximalFrequencies(signal,sample_spacing=sample_spacing,slidingWindowSize=20, stepSize=10,numberOfFrequency=3)
-    
+    showSignalMeanAndMedianFiltering(signal,windowSize)
 
 def exploreDriver(sourcePath="Drivers/16") :
     driver=Driver(sourcePath)
     driver.loadTraces()
     plotBoxPlotTracesSpeeds(driver)
     
-
-def essayer() :
-    l=[0,1,0,1,0,1,1,1,1,1]
-    t,f,spectrogram=getSTFT(l,1,4,2)
-    print t
-    print f
-    print spectrogram
-    print getMaximalFrequencies(l,1,3,2)
-
 exploreOne()
 #exploreDriver()
 #essayer()

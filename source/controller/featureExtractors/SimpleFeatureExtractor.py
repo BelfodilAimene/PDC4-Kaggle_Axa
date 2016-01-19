@@ -14,6 +14,9 @@ ABSOLUTE_ANGULAR_VELOCITY=6
 ANGULAR_ACCELERATION=7
 ANGULAR_DECELERATION=8
 
+#Each feature is divided by its scale to normalise it !
+knownScale=[1,1,50,20,20,2*math.pi,math.pi,math.pi,math.pi]
+
 
 class SimpleFeatureExtractor(FeatureExtractor) :
     def getFeatureMap(self,trace) :
@@ -48,6 +51,6 @@ class SimpleFeatureExtractor(FeatureExtractor) :
             lastEvent=e
             lastLine=newLine
 
-        #Eliminate element 0 and 1 (false acceleration , ...)
+        #Eliminate line 0 and 1 (false acceleration , ...)
         result=np.matrix(result[2:])
         return result

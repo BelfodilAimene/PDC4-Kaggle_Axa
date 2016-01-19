@@ -1,12 +1,9 @@
-import math,cmath
-import numpy as np
+import math,cmath,numpy as np,matplotlib.pyplot as plt
 from numpy.fft import rfftfreq,rfft
-import matplotlib.pyplot as plt
 
 #----------------------------------------------------------------------
-#         FFT and STFT
+#         Fourier transform and Short-Time Fourier Transform
 #----------------------------------------------------------------------
-
 def getFFT(signal, sample_spacing=1) :
     """
     get (frequency, complex coefficient) list representing the spectrum of the signal (list of value sampled with the sample_spacing (1/sample_rate) (every 1s))
