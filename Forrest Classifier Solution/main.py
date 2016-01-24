@@ -9,7 +9,7 @@ def main(sourcePath="../Data/Drivers",outputPath="axa_Submission.csv") :
     allDriverTrajectoriesScorer=AllDriverTrajectoriesScorer(sourcePath,outputPath,crossValidationFoldSize=10,evaluateModel=True)
     allDriverTrajectoriesScorer.ouptutAllScores()
     
-    elapsed_time=(time.time()-staringTime)
+    elapsed_time=time.time()-staringTime
 
     print "-"*50
     print "End",

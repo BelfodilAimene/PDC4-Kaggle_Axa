@@ -25,7 +25,7 @@ class DriverModelScorer :
         for i in range(self.crossValidationFoldNumber) :
             trueFeaturesForTrain=self.getTrueFeaturesForTrain(i)
             trueFeaturesForTest=self.extractFeatures(i*self.sizeOfTestList,(i+1)*self.sizeOfTestList)
-            scoresList+=self.getScoresForTrueFeatures(trueFeaturesForTrain,falseFeaturesForTrain,trueFeaturesForTest,falseFeaturesForTest)
+            scoresList+=self.getScoresForTrueFeatures(trueFeaturesForTrain,falseFeaturesForTrain,trueFeaturesForTest,falseFeaturesForTest,numberOfEstimator=100)
         
         return scoresList
     
@@ -42,8 +42,8 @@ class DriverModelScorer :
             sublistOfFeatures.append(featuresList)
         return sublistOfFeatures
     
-    def getScoresForTrueFeatures(self,trueFeaturesForTrain,falseFeaturesForTrain,trueFeaturesForTest,falseFeaturesForTest) :
-        forest = RandomForestClassifier(n_estimators = 100)
+    def getScoresForTrueFeatures(self,trueFeaturesForTrain,falseFeaturesForTrain,trueFeaturesForTest,falseFeaturesForTest,numberOfEstimator=100) :
+        forest = RandomForestClassifier(n_estimators = numberOfEstimator)
         XTrain=trueFeaturesForTrain+falseFeaturesForTrain
         labels=[1]*self.sizeOfTrainList+[0]*self.sizeOfTrainList
         forest = forest.fit(XTrain,labels)
