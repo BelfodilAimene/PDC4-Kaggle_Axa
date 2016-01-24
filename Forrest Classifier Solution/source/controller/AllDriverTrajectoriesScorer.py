@@ -3,6 +3,9 @@ from SimpleFeatureExtractor import *
 from DriverModelScorer import *
 from ..model.Driver import Driver
 
+DRIVER_NUMBER_PAGING=400 #The number of driver charged in memory simultaneously
+
+
 class AllDriverTrajectoriesScorer :
     def __init__(self,driverRepositoryPath,outputCSVFilePath) :
         self.driverRepositoryPath=driverRepositoryPath
@@ -13,16 +16,14 @@ class AllDriverTrajectoriesScorer :
         self.FalsePositive=0
         self.FalseNegative=0
 
-    def setFeatureExtractor(self,featureExtractor) :
-        self.featureExtractor=featureExtractor
-        return self
-
     def ouptutAllScores(self) :
         driverPaths=os.listdir(self.driverRepositoryPath)
         driverPaths.sort(key=lambda dirName : int(dirName))
         allScores=[]
-        # la liste suivante contient pour chaque driver un tableau de tripsFeatures, un tripsFeature contient pour chacune des
-        # 200 trips (le nom de du dossier du monsieur, un tableau de features)
+
+        # La liste suivante contient pour chaque driver un tableau de tripsFeatures, un tripsFeature contient pour chacune des
+        # 200 trips (le nom de du dossier du conducteur, un tableau de features)
+
         driversFeatures=[]
         curD=0
         allScores=[]
@@ -33,10 +34,13 @@ class AllDriverTrajectoriesScorer :
             driver=Driver(path)
             driversFeatures.append((driver.driverName,self.getFeaturesOfDriver(driver.getTraces())))
             curD+=1
-            if (curD%400==0) :
+            
+            if (curD%DRIVER_NUMBER_PAGING==0) :
                 allScores.extend(self.processScores(driversFeatures))
                 driversFeatures=[]
-        if (len(driversFeatures)!=0) : allScores.extend(self.processScores(driversFeatures))
+        if (len(driversFeatures)!=0) :
+            allScores.extend(self.processScores(driversFeatures))
+            driversFeatures=[]
 
         #-----------------------------------------------------------------------------------------------------
         #    Classification Evaluation
@@ -51,6 +55,7 @@ class AllDriverTrajectoriesScorer :
         print "\tRecall :",float(self.TruePositive)/float((self.TruePositive+self.FalseNegative)),"."
         print "-"*50
         #-----------------------------------------------------------------------------------------------------
+
         csvFile=open(self.outputCSVFilePath, 'w')
         csvFile.write("driver_trip"+","+"prob"+"\n")
         for driver_trip,prob in allScores :
