@@ -60,18 +60,13 @@ class SimpleFeatureExtractor() :
 
         sizeOfSortedFeatures=len(sortedSpeedFeature)
 
-        speedCentiles=[]
-        accelerationCentiles=[]
-        angularVelocityCentiles=[]
-        angularAccelerationCentiles=[]
-
+        featuresOfTrace=[]
+        
         for i in range(1,numberOfQuantile) :
             ithQuantilIndex=int(sizeOfSortedFeatures*i/numberOfQuantile)
-            speedCentiles.append(sortedSpeedFeature[ithQuantilIndex])
-            accelerationCentiles.append(sortedAccelerationFeature[ithQuantilIndex])
-            angularVelocityCentiles.append(sortedAngularVelocity[ithQuantilIndex])
-            angularAccelerationCentiles.append(sortedAngularAcceleration[ithQuantilIndex])
-
-        featuresOfTrace=speedCentiles+accelerationCentiles+angularVelocityCentiles+angularAccelerationCentiles
-
+            featuresOfTrace.append(sortedSpeedFeature[ithQuantilIndex])
+            featuresOfTrace.append(sortedAccelerationFeature[ithQuantilIndex])
+            featuresOfTrace.append(sortedAngularVelocity[ithQuantilIndex])
+            featuresOfTrace.append(sortedAngularAcceleration[ithQuantilIndex])
+            
         return featuresOfTrace
