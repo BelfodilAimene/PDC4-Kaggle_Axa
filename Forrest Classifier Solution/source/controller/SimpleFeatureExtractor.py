@@ -1,43 +1,77 @@
 import numpy as np
 import math
 
-FEATURE_NUMBER=7
-
-TIME=0
-DISTANCE=1
-SPEED=2
-ACCELERATION=3
-BEARING=4 #in radian
-ABSOLUTE_ANGULAR_VELOCITY=5
-ANGULAR_ACCELERATION=6
 
 class SimpleFeatureExtractor() :
-    def getFeatureMap(self,trace) :
-        if (len(trace)<3) : return []
+    """
+    The sampling rate is supposed to be 1 hz (1 second between each sample)
+    """
+    
+    def getFeatures(self,trace,numberOfQuantile=100) :
+        speedFeature=[]
+        accelerationFeature=[]
+        angularVelocity=[]
+        angularAcceleration=[]
 
-        result=[]
-        lastLine=[0]*FEATURE_NUMBER
         lastEvent=trace[0]
 
-        for e in trace :
-            newLine=[0]*FEATURE_NUMBER
+        lastSpeed=0
+        lastBearing=0
+        lastAngularVelocity=0
 
-            timeDifference=e.delai(lastEvent)
+        piConstant=math.pi
+        
+        for currentEvent in trace :
+            currentSpeed=currentEvent.distance(lastEvent)
+
+            """
+            currentBearing is between 0 and 2*pi
+            """
+            currentBearing=currentEvent.bearing(lastEvent)
+
+            """
+            currentAngularVelocity is between -pi and pi
+            """
+            currentAngularVelocity=currentBearing-lastBearing
+            if (currentAngularVelocity<=-piConstant) : currentAngularVelocity+=2*piConstant
+            elif (currentAngularVelocity>piConstant) : currentAngularVelocity-=2*piConstant
+
+            """
+            currentAngularAcceleration is between -pi and pi
+            """
+            currentAngularAcceleration=currentAngularVelocity-lastAngularVelocity
+            if (currentAngularAcceleration<=-piConstant) : currentAngularAcceleration+=2*piConstant
+            elif (currentAngularAcceleration>piConstant) : currentAngularAcceleration-=2*piConstant
             
-            newLine[TIME]=e.t
-            newLine[DISTANCE]=e.distance(lastEvent)
-            newLine[BEARING]=e.bearing(lastEvent)
+            speedFeature.append(currentSpeed)
+            accelerationFeature.append(currentSpeed-lastSpeed)
+            angularVelocity.append(currentAngularVelocity)
+            angularAcceleration.append(currentAngularAcceleration)
 
-            if (timeDifference>0) :
-                newLine[SPEED]=newLine[DISTANCE]/timeDifference
-                newLine[ACCELERATION]=(newLine[SPEED]-lastLine[SPEED])/timeDifference
-                newLine[ABSOLUTE_ANGULAR_VELOCITY]=(newLine[BEARING]-lastLine[BEARING])/timeDifference
-                newLine[ANGULAR_ACCELERATION]=(newLine[ABSOLUTE_ANGULAR_VELOCITY]-lastLine[ABSOLUTE_ANGULAR_VELOCITY])/timeDifference
-            result.append(newLine)
+            lastSpeed=currentSpeed
+            lastBearing=currentBearing
+            lastAngularVelocity=currentAngularVelocity
+            lastEvent=currentEvent
 
-            lastEvent=e
-            lastLine=newLine
+        sortedSpeedFeature=sorted(speedFeature[2:])
+        sortedAccelerationFeature=sorted(accelerationFeature[2:])
+        sortedAngularVelocity=sorted(angularVelocity[2:])
+        sortedAngularAcceleration=sorted(angularAcceleration[2:])
 
-        #Eliminate line 0 and 1 (false acceleration , ...)
-        result=np.matrix(result[2:])
-        return result
+        sizeOfSortedFeatures=len(sortedSpeedFeature)
+
+        speedCentiles=[]
+        accelerationCentiles=[]
+        angularVelocityCentiles=[]
+        angularAccelerationCentiles=[]
+
+        for i in range(1,numberOfQuantile) :
+            ithQuantilIndex=int(sizeOfSortedFeatures*i/numberOfQuantile)
+            speedCentiles.append(sortedSpeedFeature[ithQuantilIndex])
+            accelerationCentiles.append(sortedAccelerationFeature[ithQuantilIndex])
+            angularVelocityCentiles.append(sortedAngularVelocity[ithQuantilIndex])
+            angularAccelerationCentiles.append(sortedAngularAcceleration[ithQuantilIndex])
+
+        featuresOfTrace=speedCentiles+accelerationCentiles+angularVelocityCentiles+angularAccelerationCentiles
+
+        return featuresOfTrace

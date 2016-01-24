@@ -65,34 +65,9 @@ class AllDriverTrajectoriesScorer :
 
     def getFeaturesOfDriver(self,traces) :
         tracesFeatures=[]
-        for trace in traces : tracesFeatures.append((trace.traceName,self.getFeaturesOfTrace(trace)))
-        return tracesFeatures # this is oneDriverFeatures
-
-    def getFeaturesOfTrace(self,trace) :
         featureExtractor=SimpleFeatureExtractor()
-        featureMap=featureExtractor.getFeatureMap(trace)
-        featuresOfTrace=[]
-
-        percentiles=self.getPercentiles([row[0,SPEED] for row in featureMap])
-        featuresOfTrace+=percentiles
-        
-        percentiles=self.getPercentiles([row[0,ACCELERATION] for row in featureMap])
-        featuresOfTrace+=percentiles
-        
-        percentiles=self.getPercentiles([row[0,ABSOLUTE_ANGULAR_VELOCITY] for row in featureMap])
-        featuresOfTrace+=percentiles
-
-        percentiles=self.getPercentiles([row[0,ANGULAR_ACCELERATION] for row in featureMap])
-        featuresOfTrace+=percentiles
-        
-        return featuresOfTrace
-
-    def getPercentiles(self, signal):
-        sortedSignal=sorted(signal)
-        result=[]
-        sizeOfSignal=len(signal)
-        for i in range(100): result.append(sortedSignal[int(sizeOfSignal*i/100)])
-        return result
+        for trace in traces : tracesFeatures.append((trace.traceName,featureExtractor.getFeatures(trace)))
+        return tracesFeatures # this is oneDriverFeatures
                                
     def processScores(self,driversFeatures) :
         i=0
