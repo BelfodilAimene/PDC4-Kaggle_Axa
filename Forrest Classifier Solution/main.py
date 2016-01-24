@@ -6,7 +6,7 @@ def main(sourcePath="../Data/Drivers",outputPath="axa_Submission.csv") :
     staringTime=time.time()
 
     random.seed(0)
-    allDriverTrajectoriesScorer=AllDriverTrajectoriesScorer(sourcePath,outputPath)
+    allDriverTrajectoriesScorer=AllDriverTrajectoriesScorer(sourcePath,outputPath,crossValidationFoldSize=10,evaluateModel=True)
     allDriverTrajectoriesScorer.ouptutAllScores()
     
     elapsed_time=(time.time()-staringTime)

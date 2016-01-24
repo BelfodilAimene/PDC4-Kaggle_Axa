@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
 class DriverModelScorer :
-    def __init__(self,oneDriverFeatures,listOfFalseTracesFeatures,crossValidationFoldSize=10) :
+    def __init__(self,oneDriverFeatures,listOfFalseTracesFeatures,crossValidationFoldSize=10,evaluateModel=True) :
         self.oneDriverFeatures=oneDriverFeatures
         self.listOfFalseTracesFeatures=listOfFalseTracesFeatures
 
@@ -10,10 +10,12 @@ class DriverModelScorer :
         self.sizeOfTestList=crossValidationFoldSize
         self.sizeOfTrainList=len(self.oneDriverFeatures)-self.sizeOfTestList
 
-        self.TruePositive=0
-        self.TrueNegative=0
-        self.FalsePositive=0
-        self.FalseNegative=0
+        self.evaluateModel=evaluateModel
+        if (evaluateModel) :
+            self.TruePositive=0
+            self.TrueNegative=0
+            self.FalsePositive=0
+            self.FalseNegative=0
 
     def getScores(self) :    
         scoresList=[]
@@ -47,10 +49,17 @@ class DriverModelScorer :
         forest = forest.fit(XTrain,labels)
         resultForCurrentDriver=forest.predict(trueFeaturesForTest)
         resultForOthers=forest.predict(falseFeaturesForTest)
-        for element in resultForCurrentDriver:
-            if (element==0) : self.FalseNegative+=1
-            else : self.TruePositive+=1
-        for element in resultForOthers:
-            if (element==0) : self.TrueNegative+=1
-            else : self.FalsePositive+=1
+
+        #-----------------------------------------------------------------------------------------------------
+        #    Information for evaluation update
+        #-----------------------------------------------------------------------------------------------------
+        if (self.evaluateModel) :
+            for element in resultForCurrentDriver:
+                if (element==0) : self.FalseNegative+=1
+                else : self.TruePositive+=1
+            for element in resultForOthers:
+                if (element==0) : self.TrueNegative+=1
+                else : self.FalsePositive+=1
+        #-----------------------------------------------------------------------------------------------------
+
         return list(resultForCurrentDriver)

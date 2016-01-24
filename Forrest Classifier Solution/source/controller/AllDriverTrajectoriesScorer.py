@@ -7,14 +7,17 @@ DRIVER_NUMBER_PAGING=400 #The number of driver loaded in memory simultaneously
 
 
 class AllDriverTrajectoriesScorer :
-    def __init__(self,driverRepositoryPath,outputCSVFilePath) :
+    def __init__(self,driverRepositoryPath,outputCSVFilePath,crossValidationFoldSize=10,evaluateModel=True) :
         self.driverRepositoryPath=driverRepositoryPath
         self.outputCSVFilePath=outputCSVFilePath
 
-        self.TruePositive=0
-        self.TrueNegative=0
-        self.FalsePositive=0
-        self.FalseNegative=0
+        self.crossValidationFoldSize=crossValidationFoldSize
+        self.evaluateModel=evaluateModel
+        if (evaluateModel) :
+            self.TruePositive=0
+            self.TrueNegative=0
+            self.FalsePositive=0
+            self.FalseNegative=0
 
     def ouptutAllScores(self) :
         driverPaths=os.listdir(self.driverRepositoryPath)
@@ -42,18 +45,20 @@ class AllDriverTrajectoriesScorer :
             allScores.extend(self.processScores(driversFeatures))
             driversFeatures=[]
 
+        
         #-----------------------------------------------------------------------------------------------------
         #    Classification Evaluation
         #-----------------------------------------------------------------------------------------------------
-        print "-"*50
-        print "Classification evaluation :"
-        print "\tTP :",self.TruePositive,"."
-        print "\tTN :",self.TrueNegative,"."
-        print "\tFP :",self.FalsePositive,"."
-        print "\tFN :",self.FalseNegative,"."
-        print "\tPrecision :",float(self.TruePositive)/float((self.TruePositive+self.FalsePositive)),"."
-        print "\tRecall :",float(self.TruePositive)/float((self.TruePositive+self.FalseNegative)),"."
-        print "-"*50
+        if (self.evaluateModel) :
+            print "-"*50
+            print "Classification evaluation :"
+            print "\tTP :",self.TruePositive,"."
+            print "\tTN :",self.TrueNegative,"."
+            print "\tFP :",self.FalsePositive,"."
+            print "\tFN :",self.FalseNegative,"."
+            print "\tPrecision :",float(self.TruePositive)/float((self.TruePositive+self.FalsePositive)),"."
+            print "\tRecall :",float(self.TruePositive)/float((self.TruePositive+self.FalseNegative)),"."
+            print "-"*50
         #-----------------------------------------------------------------------------------------------------
 
         csvFile=open(self.outputCSVFilePath, 'w')
@@ -76,14 +81,18 @@ class AllDriverTrajectoriesScorer :
         for driverName, oneDriverFeatures in driversFeatures :
             print "\tCurrent driver :",i
             listOfFalseTracesFeatures=self.getListOfNotCurrentDriver(driversFeatures,i,len(oneDriverFeatures))
-            driverModelScorer=DriverModelScorer(oneDriverFeatures,listOfFalseTracesFeatures)
+            driverModelScorer=DriverModelScorer(oneDriverFeatures,listOfFalseTracesFeatures,crossValidationFoldSize=self.crossValidationFoldSize,evaluateModel=self.evaluateModel)
             scoresValues=driverModelScorer.getScores()
 
-            # update of evaluations
-            self.TruePositive+=driverModelScorer.TruePositive
-            self.TrueNegative+=driverModelScorer.TrueNegative
-            self.FalsePositive+=driverModelScorer.FalsePositive
-            self.FalseNegative+=driverModelScorer.FalseNegative
+            #-----------------------------------------------------------------------------------------------------
+            #    Information for evaluation update
+            #-----------------------------------------------------------------------------------------------------
+            if (self.evaluateModel) :
+                self.TruePositive+=driverModelScorer.TruePositive
+                self.TrueNegative+=driverModelScorer.TrueNegative
+                self.FalsePositive+=driverModelScorer.FalsePositive
+                self.FalseNegative+=driverModelScorer.FalseNegative
+            #-----------------------------------------------------------------------------------------------------
 
             scoresList=[]
             j=0
