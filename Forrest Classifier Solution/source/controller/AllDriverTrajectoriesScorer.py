@@ -1,45 +1,23 @@
-import os
-import random
-#from DriverTrajectoriesScorer import DriverTrajectoriesScorer
-from cleaners.NoCleaner import NoCleaner
-from featureExtractors.SimpleFeatureExtractor import *
-from scorers.ModelScorer.DriverModelScorer import *
-
-#from normalizers.NoNormalizer import NoNormalizer
-from scorers.NoScorer import NoScorer
+import os,random
+from SimpleFeatureExtractor import *
+from DriverModelScorer import *
 from ..model.Driver import Driver
 
 class AllDriverTrajectoriesScorer :
     def __init__(self,driverRepositoryPath,outputCSVFilePath) :
         self.driverRepositoryPath=driverRepositoryPath
         self.outputCSVFilePath=outputCSVFilePath
-        self.cleaner=NoCleaner()
-        self.featureExtractor=SimpleFeatureExtractor()
-        #self.normalizer=NoNormalizer()
-        self.scorer=NoScorer()
+
         self.TruePositive=0
         self.TrueNegative=0
         self.FalsePositive=0
         self.FalseNegative=0
 
-    def setCleaner(self,cleaner) :
-        self.cleaner=cleaner
-        return self
-
     def setFeatureExtractor(self,featureExtractor) :
         self.featureExtractor=featureExtractor
         return self
 
-    def setNormalizer(self,normalizer) :
-        self.normalizer=normalizer
-        return self
-
-    def setScorer(self,scorer) :
-        self.scorer=scorer
-        return self
-        
     def ouptutAllScores(self) :
-        #driverTrajectoriesScorer=DriverTrajectoriesScorer(self.cleaner,self.featureExtractor,self.normalizer,self.scorer)
         driverPaths=os.listdir(self.driverRepositoryPath)
         driverPaths.sort(key=lambda dirName : int(dirName))
         allScores=[]
@@ -48,10 +26,9 @@ class AllDriverTrajectoriesScorer :
         driversFeatures=[]
         curD=0
         allScores=[]
-        print "feature extraction"
+        print "Feature extraction : "
         for driverPath in driverPaths :
-            print "current driver :"
-            print curD            
+            print "\tCurrent driver :",curD
             path=os.path.join(self.driverRepositoryPath,driverPath)
             driver=Driver(path)
             driversFeatures.append((driver.driverName,self.getFeaturesOfDriver(driver.getTraces())))
@@ -59,18 +36,21 @@ class AllDriverTrajectoriesScorer :
             if (curD%400==0) :
                 allScores.extend(self.processScores(driversFeatures))
                 driversFeatures=[]
-        if (len(driversFeatures)!=0) :
-            allScores.extend(self.processScores(driversFeatures))        
-        print "evaluation :"
-        print self.TruePositive
-        print self.TrueNegative
-        print self.FalsePositive
-        print self.FalseNegative
-        print "precision"
-        print float(self.TruePositive)/float((self.TruePositive+self.FalsePositive))
-        print "recall"
-        print float(self.TruePositive)/float((self.TruePositive+self.FalseNegative))
-        print "end"
+        if (len(driversFeatures)!=0) : allScores.extend(self.processScores(driversFeatures))
+
+        #-----------------------------------------------------------------------------------------------------
+        #    Classification Evaluation
+        #-----------------------------------------------------------------------------------------------------
+        print "-"*50
+        print "Classification evaluation :"
+        print "\tTP :",self.TruePositive,"."
+        print "\tTN :",self.TrueNegative,"."
+        print "\tFP :",self.FalsePositive,"."
+        print "\tFN :",self.FalseNegative,"."
+        print "\tPrecision :",float(self.TruePositive)/float((self.TruePositive+self.FalsePositive)),"."
+        print "\tRecall :",float(self.TruePositive)/float((self.TruePositive+self.FalseNegative)),"."
+        print "-"*50
+        #-----------------------------------------------------------------------------------------------------
         csvFile=open(self.outputCSVFilePath, 'w')
         csvFile.write("driver_trip"+","+"prob"+"\n")
         for driver_trip,prob in allScores :
@@ -83,6 +63,7 @@ class AllDriverTrajectoriesScorer :
         for trace in traces :
             tracesFeatures.append((trace.traceName,self.getFeaturesOfTrace(trace)))
         return tracesFeatures # this is oneDriverFeatures
+
     def getFeaturesOfTrace(self,trace) :
         featureExtractor=SimpleFeatureExtractor()
         featureMap=featureExtractor.getFeatureMap(trace)
@@ -118,18 +99,16 @@ class AllDriverTrajectoriesScorer :
         sortedSignal=sorted(signal)
         result=[]
         sizeOfSignal=len(signal)
-        for i in range(100):
-            result.append(sortedSignal[int(sizeOfSignal*i/100)])
+        for i in range(100): result.append(sortedSignal[int(sizeOfSignal*i/100)])
         return result
                                
     def processScores(self,driversFeatures) :
         i=0
         numberOfFalseTraces=200
         allScores=[]
-        print "scoring"
+        print "Scoring traces :"
         for driverName, oneDriverFeatures in driversFeatures :
-            print "current Driver "
-            print i
+            print "\tCurrent driver :",i
             listOfFalseTracesFeatures=self.getListOfNotCurrentDriver(driversFeatures,i,numberOfFalseTraces)
             driverModelScorer=DriverModelScorer(oneDriverFeatures,listOfFalseTracesFeatures)
             scoresValues=driverModelScorer.getScores()
@@ -150,9 +129,6 @@ class AllDriverTrajectoriesScorer :
             i+=1
         return allScores
 
-
-
-
     def getListOfNotCurrentDriver(self,driversFeatures,currentDriverIndex,numberOfFalseTraces) :
         listOfFalseTraces=[]
         numberOfDrivers=len(driversFeatures)
@@ -164,20 +140,4 @@ class AllDriverTrajectoriesScorer :
             falseDriverName, falseDriverFeatures =driversFeatures[falseDriverIndex]
             falseTraceName,falseTraceFeatures=falseDriverFeatures[falseTraceIndex]
             listOfFalseTraces.append(falseTraceFeatures)
-        return listOfFalseTraces
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-        
+        return listOfFalseTraces    
