@@ -42,7 +42,6 @@ class HMMBasedScorer(Scorer) :
             velocityFrequencies2.append([row[1] for row in frequencies2])
             velocityFrequencies3.append([row[2] for row in frequencies2])
 
-            
         TrainedList=np.column_stack([accelerationFrequencies1ForLearn,accelerationFrequencies2ForLearn,accelerationFrequencies3ForLearn,velocityFrequencies1ForLearn,velocityFrequencies2ForLearn,velocityFrequencies3ForLearn])
         model = GaussianHMM(n_components=6, covariance_type="diag", n_iter=1000).fit(TrainedList)
         hmmScores=[]

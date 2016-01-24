@@ -10,7 +10,7 @@ from source.controller.cleaners.utils.Utils import *
 
 from source.exploratory.Exploration import *
 
-def exploreOne(sourcePath="Data/Drivers/16/122.csv") :
+def exploreOne(sourcePath="../Data/Drivers/16/122.csv") :
 
     trace=Trace(sourcePath)
     trace.loadTrace()
@@ -32,8 +32,5 @@ def exploreDriver(sourcePath="Drivers/16") :
     plotBoxPlotTracesSpeeds(driver)
     
 exploreOne()
-#exploreDriver()
-#essayer()
-
 
 
