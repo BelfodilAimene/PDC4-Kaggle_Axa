@@ -3,7 +3,7 @@ from SimpleFeatureExtractor import *
 from DriverModelScorer import *
 from ..model.Driver import Driver
 
-DRIVER_NUMBER_PAGING=400 #The number of driver charged in memory simultaneously
+DRIVER_NUMBER_PAGING=400 #The number of driver loaded in memory simultaneously
 
 
 class AllDriverTrajectoriesScorer :
@@ -25,17 +25,17 @@ class AllDriverTrajectoriesScorer :
         # 200 trips (le nom de du dossier du conducteur, un tableau de features)
 
         driversFeatures=[]
-        curD=0
+        currentDriverIndex=0
         allScores=[]
         print "Feature extraction : "
         for driverPath in driverPaths :
-            print "\tCurrent driver :",curD
+            print "\tCurrent driver :",currentDriverIndex
             path=os.path.join(self.driverRepositoryPath,driverPath)
             driver=Driver(path)
             driversFeatures.append((driver.driverName,self.getFeaturesOfDriver(driver.getTraces())))
-            curD+=1
+            currentDriverIndex+=1
             
-            if (curD%DRIVER_NUMBER_PAGING==0) :
+            if (currentDriverIndex%DRIVER_NUMBER_PAGING==0) :
                 allScores.extend(self.processScores(driversFeatures))
                 driversFeatures=[]
         if (len(driversFeatures)!=0) :
@@ -65,8 +65,7 @@ class AllDriverTrajectoriesScorer :
 
     def getFeaturesOfDriver(self,traces) :
         tracesFeatures=[]
-        for trace in traces :
-            tracesFeatures.append((trace.traceName,self.getFeaturesOfTrace(trace)))
+        for trace in traces : tracesFeatures.append((trace.traceName,self.getFeaturesOfTrace(trace)))
         return tracesFeatures # this is oneDriverFeatures
 
     def getFeaturesOfTrace(self,trace) :
@@ -74,28 +73,16 @@ class AllDriverTrajectoriesScorer :
         featureMap=featureExtractor.getFeatureMap(trace)
         featuresOfTrace=[]
 
-        #percentiles=self.getPercentiles([row[0,DISTANCE] for row in featureMap])
-        #print percentiles
-        #featuresOfTrace+=percentiles
-        
         percentiles=self.getPercentiles([row[0,SPEED] for row in featureMap])
-        #print percentiles
         featuresOfTrace+=percentiles
         
         percentiles=self.getPercentiles([row[0,ACCELERATION] for row in featureMap])
-        #print percentiles
         featuresOfTrace+=percentiles
         
-        #percentiles=self.getPercentiles([row[0,BEARING] for row in featureMap])
-        #print percentiles
-        #featuresOfTrace+=percentiles
-        
         percentiles=self.getPercentiles([row[0,ABSOLUTE_ANGULAR_VELOCITY] for row in featureMap])
-        #print percentiles
         featuresOfTrace+=percentiles
 
         percentiles=self.getPercentiles([row[0,ANGULAR_ACCELERATION] for row in featureMap])
-        #print percentiles
         featuresOfTrace+=percentiles
         
         return featuresOfTrace
@@ -109,19 +96,20 @@ class AllDriverTrajectoriesScorer :
                                
     def processScores(self,driversFeatures) :
         i=0
-        numberOfFalseTraces=200
         allScores=[]
         print "Scoring traces :"
         for driverName, oneDriverFeatures in driversFeatures :
             print "\tCurrent driver :",i
-            listOfFalseTracesFeatures=self.getListOfNotCurrentDriver(driversFeatures,i,numberOfFalseTraces)
+            listOfFalseTracesFeatures=self.getListOfNotCurrentDriver(driversFeatures,i,len(oneDriverFeatures))
             driverModelScorer=DriverModelScorer(oneDriverFeatures,listOfFalseTracesFeatures)
             scoresValues=driverModelScorer.getScores()
+
             # update of evaluations
             self.TruePositive+=driverModelScorer.TruePositive
             self.TrueNegative+=driverModelScorer.TrueNegative
             self.FalsePositive+=driverModelScorer.FalsePositive
             self.FalseNegative+=driverModelScorer.FalseNegative
+
             scoresList=[]
             j=0
             for traceName,featuresList in oneDriverFeatures :    
@@ -139,10 +127,9 @@ class AllDriverTrajectoriesScorer :
         numberOfDrivers=len(driversFeatures)
         for i in range(numberOfFalseTraces) :
             falseDriverIndex=random.randint(0, numberOfDrivers-2)
-            if (falseDriverIndex>=currentDriverIndex) :
-                falseDriverIndex+=1
-            falseTraceIndex=random.randint(0, 199)
-            falseDriverName, falseDriverFeatures =driversFeatures[falseDriverIndex]
+            if (falseDriverIndex>=currentDriverIndex) : falseDriverIndex+=1
+            falseDriverName,falseDriverFeatures =driversFeatures[falseDriverIndex]
+            falseTraceIndex=random.randint(0, len(falseDriverFeatures)-1)
             falseTraceName,falseTraceFeatures=falseDriverFeatures[falseTraceIndex]
             listOfFalseTraces.append(falseTraceFeatures)
         return listOfFalseTraces    
