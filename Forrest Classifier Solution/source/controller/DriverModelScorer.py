@@ -47,7 +47,8 @@ class DriverModelScorer :
         XTrain=trueFeaturesForTrain+falseFeaturesForTrain
         labels=[1]*self.sizeOfTrainList+[0]*self.sizeOfTrainList
         forest = forest.fit(XTrain,labels)
-        resultForCurrentDriver=forest.predict(trueFeaturesForTest)
+        resultForCurrentDriverProba=forest.predict_proba(trueFeaturesForTest)
+        resultForCurrentDriver=[row[1] for row in resultForCurrentDriverProba]
         resultForOthers=forest.predict(falseFeaturesForTest)
 
         #-----------------------------------------------------------------------------------------------------
@@ -55,7 +56,7 @@ class DriverModelScorer :
         #-----------------------------------------------------------------------------------------------------
         if (self.evaluateModel) :
             for element in resultForCurrentDriver:
-                if (element==0) : self.FalseNegative+=1
+                if (element<0.5) : self.FalseNegative+=1
                 else : self.TruePositive+=1
             for element in resultForOthers:
                 if (element==0) : self.TrueNegative+=1
